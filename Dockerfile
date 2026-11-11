@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 # -----------------------------------------------------------------------------
 # Stage 1: Base image with Node 22 Alpine, libc6-compat, and Corepack pnpm
 # -----------------------------------------------------------------------------
@@ -8,7 +9,7 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
 # -----------------------------------------------------------------------------
-# Stage 2: Install dependencies with BuildKit pnpm cache mount
+# Stage 2: Install dependencies
 # -----------------------------------------------------------------------------
 FROM base AS deps
 WORKDIR /app
@@ -20,8 +21,7 @@ COPY apps/mobile/package.json ./apps/mobile/
 COPY packages/db/package.json ./packages/db/
 COPY packages/shared/package.json ./packages/shared/
 
-RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
-    pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 # -----------------------------------------------------------------------------
 # Stage 3: Build the Next.js standalone bundle
